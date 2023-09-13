@@ -10,8 +10,10 @@ rcpp_hello_world()
 Example hello function
 }
 \details{
-Creates a pointless two element mekiiiiiiii anjeeeeeeeenngggggg
+Creates a pointless two element list lorem ipsum
 }
 \examples{
+\dontrun{
 rcpp_hello_world()
+}
 }

@@ -3,11 +3,13 @@ using namespace Rcpp;
 
 //' Example hello function
 //' 
-//' @details Creates a pointless two element mekiiiiiiii anjeeeeeeeenngggggg
+//' @details Creates a pointless two element list lorem ipsum
 //'
 //' @export
 //' @examples
+//' \dontrun{
 //' rcpp_hello_world()
+//' }
 // [[Rcpp::export]]
 List rcpp_hello_world() {
 
