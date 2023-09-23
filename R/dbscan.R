@@ -4,8 +4,8 @@
 #' Applies the DBSCAN algorithm to a given dataset.
 #' 
 #' @param data Dataset or distance matrix to be clustered.
-#' @param min_pts Minimum number of points required to be found within \code{eps} distance to form a cluster.
 #' @param eps Maximum distance in which to find \code{min_pts} neighbours to form a cluster.
+#' @param min_pts Minimum number of points required to be found within \code{eps} distance to form a cluster.
 #' @param metric Distance metric. Defaults to \code{euclidean}, other options are \code{manhattan} and
 #' \code{precomputed}. If \code{precomputed}, \code{data} must be a distance matrix.
 #' @param normalise Logical; whether to normalise \code{data} before fitting. Defaults to \code{TRUE}.
@@ -13,7 +13,8 @@
 #' Defaults to \code{FALSE}.
 #' 
 #' @details
-#' border points equal \code{FALSE} is consistent with DBSCAN* described in Campello et al. 2013
+#' \code{borderPoints = TRUE} would be equivalent to the original DBSCAN algorithm described by Ester et al.,
+#' while \code{FALSE} would be equivalent to DBSCAN* described in Campello et al. 2013
 #' 
 #' @keywords clustering
 #' @examples
@@ -23,38 +24,9 @@
 #' }
 #' @export
 
-dbscan <- function(data, min_pts, eps, metric="euclidean", normalise=TRUE, borderPoints=FALSE) {
-  # checking data: can't be null
-  if (is.null(data)) {
-    stop("Please supply a dataset/distance matrix")
-  }
-  # checking data: must be a matrix or data.frame
-  else if (!is.matrix(data) & !is.data.frame(data)) {
-    stop("data must be a matrix or data.frame.")
-  }
-  
-  # check distance metric: must be one of the three options
-  if (!metric %in% c("euclidean", "manhattan", "precomputed")) {
-    stop("Options for distance metric are 'euclidean', 'manhattan' or 'precomputed'.")
-  }
-  # check distance metric: if precomputed, then data must be a distance matrix
-  if (metric == 'precomputed') {
-    if (nrow(data) != ncol(data)) {
-      stop("Distance matrix must be of size n x n.")
-    }
-    else if (sum(diag(data)) != 0) {
-      stop("Distance matrix must have all diagonal elements be 0.")
-    }
-  }
-  
-  # checking min_pts and eps: both must be numeric and > 0
-  if (!all(sapply(c(min_pts, eps), is.numeric)) | any(min_pts <= 0, eps <= 0)) {
-    stop("Both min_pts and eps must be non-zero positive numbers.")
-  }
-  
-  if (!all(sapply(c(normalise, borderPoints), is.logical))) {
-    stop("Both normalise and borderPoints must be boolean.")
-  }
+dbscan <- function(data, eps, min_pts, metric="euclidean", normalise=TRUE, borderPoints=FALSE) {
+  # input validation
+  dbscan_input_checks(data, eps, min_pts, metric, normalise, borderPoints)
   
   # if precomputed, data is already a distance matrix
   if (metric == 'precomputed') {
@@ -73,6 +45,8 @@ dbscan <- function(data, min_pts, eps, metric="euclidean", normalise=TRUE, borde
     sum(x > 0 & x <= eps) + 1 >= min_pts
   })
   core_pts <- as.vector(which(is_core_pt))
+  # anything that is not a core point is simply a non-core point
+  noncore_pts <- as.vector(which(!is_core_pt))
   
   n_obs <- nrow(dist_mat)
   clust_lab <- rep(NA, n_obs)
@@ -80,22 +54,26 @@ dbscan <- function(data, min_pts, eps, metric="euclidean", normalise=TRUE, borde
   
   # start time of algorithm fitting
   start <- Sys.time()
-  # if border points are included, expand clusters starting from core points;
-  # if not, expand starting from the first row of distance matrix
-  loop <- if (borderPoints) core_pts else c(1:n_obs)
-  for (o in loop) {
+  # generate initial clusters consisting only of core points (points that fulfill the requirement
+  # of having min_pts points within eps radius)
+  for (o in 1:n_obs) {
     if (is.na(clust_lab[o])) {
       neighbours <- find_neighbours(dist_mat[o, ], eps)
-      if (length(neighbours) + 1 >= 5) {
-        if (is.na(clust_lab[o])) {
-          clust_lab[o] <- clust_num
-        }
-        clust_lab <- expand_clusters(dist_mat, min_pts, eps, borderPoints,
-                                     neighbours, clust_lab, clust_num)
+      if (length(neighbours) + 1 >= min_pts) {
+        clust_lab[o] <- clust_num
+        clust_lab <- create_init_clusters(dist_mat, eps, min_pts, neighbours, clust_lab, clust_num)
         clust_num <- clust_num + 1
       }
     }
   }
+  
+  # if border points are included, then expand clusters by looking at each non-core point to find
+  # if they are a neighbour of a core point. if border points are not included, then clusters consist
+  # entirely only of core points
+  if (borderPoints) {
+    clust_lab <- expand_clusters(dist_mat, eps, core_pts, noncore_pts, clust_lab)
+  }
+  
   # finish time of algorithm fitting
   finish <- Sys.time()
   # Sys.time() returns a POSIXct class object, so convert it to keep only the
@@ -105,6 +83,6 @@ dbscan <- function(data, min_pts, eps, metric="euclidean", normalise=TRUE, borde
   clust_lab <- replace(clust_lab, is.na(clust_lab), 0)
   rm(dist_mat)
   
-  result <- def_dbscan(data, clust_lab, duration, metric)
+  result <- def_dbscan(data, eps, min_pts, clust_lab, duration, metric)
   return(result)
 }

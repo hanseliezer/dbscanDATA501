@@ -6,8 +6,8 @@
 \usage{
 dbscan(
   data,
-  min_pts,
   eps,
+  min_pts,
   metric = "euclidean",
   normalise = TRUE,
   borderPoints = FALSE
@@ -16,9 +16,9 @@ dbscan(
 \arguments{
 \item{data}{Dataset or distance matrix to be clustered.}
 
-\item{min_pts}{Minimum number of points required to be found within \code{eps} distance to form a cluster.}
-
 \item{eps}{Maximum distance in which to find \code{min_pts} neighbours to form a cluster.}
+
+\item{min_pts}{Minimum number of points required to be found within \code{eps} distance to form a cluster.}
 
 \item{metric}{Distance metric. Defaults to \code{euclidean}, other options are \code{manhattan} and
 \code{precomputed}. If \code{precomputed}, \code{data} must be a distance matrix.}
@@ -32,7 +32,8 @@ Defaults to \code{FALSE}.}
 Applies the DBSCAN algorithm to a given dataset.
 }
 \details{
-border points equal \code{FALSE} is consistent with DBSCAN* described in Campello et al. 2013
+\code{borderPoints = TRUE} would be equivalent to the original DBSCAN algorithm described by Ester et al.,
+while \code{FALSE} would be equivalent to DBSCAN* described in Campello et al. 2013
 }
 \examples{
 \dontrun{

@@ -1,0 +1,66 @@
+#' Summary method for DBSCAN
+#' 
+#' @description
+#' Prints summary statistics for DBSCAN-generated clusters.
+#' 
+#' @param obj Object of class `dbscan`.
+#' 
+#' @details
+#' Four summary statistics: connectivity, Dunn, silhouette, CDBW
+#' 
+#' @keywords clustering
+#' @examples
+#' \dontrun{
+#' blobs <- read.csv('blobs.csv')
+#' blobs_clust <- dbscan(blobs, 0.2, 5)
+#' summary(blobs_clust)
+#' }
+#' @export
+summary.dbscan <- function(obj) {
+  clust_nums <- obj$cluster_labels[obj$cluster_labels != 0]
+  n_clusters <- if (length(unique(clust_nums)) > 0) length(unique(clust_nums)) else 0
+  
+  score_conn <- clValid::connectivity(Data=obj$dataset,
+                                      clusters=obj$cluster_labels)
+  silh <- cluster::silhouette(x=obj$cluster_labels,
+                              dist=dist(obj$dataset))
+  score_silh <- mean(silh[, 'sil_width'])
+  score_dunn <- clValid::dunn(Data=obj$dataset,
+                              clusters=obj$cluster_labels)
+  score_cdbw <- fpc::cdbw(x=obj$dataset,
+                          clustering=obj$cluster_labels)$cdbw
+  
+  print_list <- list('min_pts'=obj$min_pts,
+                     'eps'=obj$eps,
+                     'metric'=obj$metric,
+                     'fitting_time'=obj$fitting_time,
+                     'n_clusters'=n_clusters,
+                     'score_conn'=score_conn,
+                     'score_silh'=score_silh,
+                     'score_dunn'=score_dunn,
+                     'score_cdbw'=score_cdbw)
+  print_list_obj <- structure(print_list,
+                              class='summary.dbscan')
+  
+  print(print_list_obj)
+  
+}
+
+print.summary.dbscan <-function(obj) {
+  cat("DBSCAN result summary:\n\n")
+  
+  cat("Parameters:\n")
+  cat("eps:", obj$eps, "\n")
+  cat("min_pts:", obj$min_pts, "\n")
+  cat(paste0("Distance metric: ", obj$metric, "\n\n"))
+  
+  cat(paste0("Running time (s): ", round(obj$fitting_time, 5), "\n"))
+  cat(paste0("Number of generated clusters (excl. noise): ", obj$n_clusters, "\n\n"))
+  
+  cat("Clustering quality metrics:\n")
+  cat(paste0("Connectivity: ", round(obj$score_conn, 5), "\n"))
+  cat(paste0("Silhouette width: ", round(obj$score_silh, 5), "\n"))
+  cat(paste0("Dunn index: ", round(obj$score_dunn, 5), "\n"))
+  cat(paste0("CDbw: ", round(obj$score_cdbw, 5), "\n\n"))
+  cat("NOTE: Caution must be taken when interpreting connectivity, silhouette and\nDunn index for non-globular clusters.")
+}

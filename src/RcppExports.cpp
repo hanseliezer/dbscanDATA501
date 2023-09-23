@@ -10,19 +10,54 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// rcpp_hello_world
-List rcpp_hello_world();
-RcppExport SEXP _dbscanDATA501_rcpp_hello_world() {
+// find_neighbours
+IntegerVector find_neighbours(NumericVector dist_vec, double eps);
+RcppExport SEXP _dbscanDATA501_find_neighbours(SEXP dist_vecSEXP, SEXP epsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(rcpp_hello_world());
+    Rcpp::traits::input_parameter< NumericVector >::type dist_vec(dist_vecSEXP);
+    Rcpp::traits::input_parameter< double >::type eps(epsSEXP);
+    rcpp_result_gen = Rcpp::wrap(find_neighbours(dist_vec, eps));
+    return rcpp_result_gen;
+END_RCPP
+}
+// create_init_clusters
+IntegerVector create_init_clusters(NumericMatrix dist_mat, double eps, int min_pts, IntegerVector neigh_pts, IntegerVector labs, int clust_num);
+RcppExport SEXP _dbscanDATA501_create_init_clusters(SEXP dist_matSEXP, SEXP epsSEXP, SEXP min_ptsSEXP, SEXP neigh_ptsSEXP, SEXP labsSEXP, SEXP clust_numSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type dist_mat(dist_matSEXP);
+    Rcpp::traits::input_parameter< double >::type eps(epsSEXP);
+    Rcpp::traits::input_parameter< int >::type min_pts(min_ptsSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type neigh_pts(neigh_ptsSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type labs(labsSEXP);
+    Rcpp::traits::input_parameter< int >::type clust_num(clust_numSEXP);
+    rcpp_result_gen = Rcpp::wrap(create_init_clusters(dist_mat, eps, min_pts, neigh_pts, labs, clust_num));
+    return rcpp_result_gen;
+END_RCPP
+}
+// expand_clusters
+IntegerVector expand_clusters(NumericMatrix dist_mat, double eps, IntegerVector core_pts, IntegerVector noncore_pts, IntegerVector labs);
+RcppExport SEXP _dbscanDATA501_expand_clusters(SEXP dist_matSEXP, SEXP epsSEXP, SEXP core_ptsSEXP, SEXP noncore_ptsSEXP, SEXP labsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type dist_mat(dist_matSEXP);
+    Rcpp::traits::input_parameter< double >::type eps(epsSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type core_pts(core_ptsSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type noncore_pts(noncore_ptsSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type labs(labsSEXP);
+    rcpp_result_gen = Rcpp::wrap(expand_clusters(dist_mat, eps, core_pts, noncore_pts, labs));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_dbscanDATA501_rcpp_hello_world", (DL_FUNC) &_dbscanDATA501_rcpp_hello_world, 0},
+    {"_dbscanDATA501_find_neighbours", (DL_FUNC) &_dbscanDATA501_find_neighbours, 2},
+    {"_dbscanDATA501_create_init_clusters", (DL_FUNC) &_dbscanDATA501_create_init_clusters, 6},
+    {"_dbscanDATA501_expand_clusters", (DL_FUNC) &_dbscanDATA501_expand_clusters, 5},
     {NULL, NULL, 0}
 };
 
