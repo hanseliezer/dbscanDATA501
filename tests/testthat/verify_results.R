@@ -1,4 +1,4 @@
-classif <- read.csv("../classif.csv")
+classif <- read.csv("../../dat/classif.csv")
 
 test_min_pts <- 4
 test_eps <- 5
@@ -12,7 +12,7 @@ dbscan_my <- dbscan(classif, test_min_pts, test_eps)$cluster_labs
 corepts_true_dbs <- dbscan::is.corepoint(scale(classif), test_min_pts, test_eps)
 corepts_my <- is_core_point(classif, test_min_pts, test_eps)
 
-test_that("Verify regression results", {
+test_that("Verify clustering results", {
   
   # compare cluster labels with fpc
   expect_equal(dbscan_true_fpc, dbscan_my)

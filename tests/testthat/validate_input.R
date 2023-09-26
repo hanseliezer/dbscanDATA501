@@ -1,4 +1,4 @@
-classif <- read.csv("../classif.csv")
+classif <- read.csv("../../dat/classif.csv")
 
 classif_str <- classif
 classif_str$X20 <- c(rep("A", 200), rep("B", 300))
