@@ -2,6 +2,7 @@
 % Please edit documentation in R/dbscan.R
 \name{dbscan}
 \alias{dbscan}
+\alias{is_core_point}
 \title{Density-based spatial clustering of applications with noise (DBSCAN)}
 \usage{
 dbscan(
@@ -10,8 +11,10 @@ dbscan(
   min_pts,
   metric = "euclidean",
   normalise = TRUE,
-  borderPoints = FALSE
+  border_pts = TRUE
 )
+
+is_core_point(data, eps, min_pts, metric = "euclidean", normalise = TRUE)
 }
 \arguments{
 \item{data}{Dataset or distance matrix to be clustered.}
@@ -25,14 +28,33 @@ dbscan(
 
 \item{normalise}{Logical; whether to normalise \code{data} before fitting. Defaults to \code{TRUE}.}
 
-\item{borderPoints}{Logical; whether "border points" should be included in a cluster.
-Defaults to \code{FALSE}.}
+\item{border_pts}{Logical; whether "border points" should be included in a cluster.
+Defaults to \code{TRUE}.}
+}
+\value{
+\code{dbscan()} returns a list object of class \code{dbscan} with the following components:
+
+\item{dataset }{ Original dataset being clustered.}
+\item{eps }{ Value of \code{eps} parameter used.}
+\item{min_pts }{ Value of \code{min_pts} parameter used.}
+\item{metric }{ Distance metric used.}
+\item{border_pts }{ Whether border points are clustered.}
+\item{cluster_labs }{ Integer vector with indicating cluster membership. Noise points are assigned 0.}
+\item{fitting_time }{ Total algorithm fitting time in seconds.}
+
+\code{is_core_point()} returns a logical vector indicating whether each observation in the dataset would be
+considered a core point under the given \code{eps} and \code{min_pts} parameters.
 }
 \description{
 Applies the DBSCAN algorithm to a given dataset.
 }
 \details{
-\code{borderPoints = TRUE} would be equivalent to the original DBSCAN algorithm described by Ester et al.,
+The most important parameters to set are \code{min_pts} and \code{eps}
+
+If dataset is not yet normalised, it is highly recommended to set \code{normalise} to true: as a distance-based
+algorithm, DBSCAN is still sensitive to features being on varying scales
+
+\code{border_pts = TRUE} would be equivalent to the original DBSCAN algorithm described by Ester et al.,
 while \code{FALSE} would be equivalent to DBSCAN* described in Campello et al. 2013
 }
 \examples{
