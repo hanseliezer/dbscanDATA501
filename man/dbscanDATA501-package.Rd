@@ -1,34 +1,26 @@
 \name{dbscanDATA501-package}
-\alias{dbscanDATA501-package}
 \alias{dbscanDATA501}
 \docType{package}
 \title{
-  A short title line describing what the package does
+  Density-based Spatial Clustering of Applications with Noise (DBSCAN)
 }
 \description{
-  A more detailed description of what the package does. A length
-  of about one to five lines is recommended.
-}
-\details{
-  This section should provide a more detailed overview of how to use the
-  package, including the most important functions.
+  A basic implementation of the DBSCAN algorithm. Obtain clusters from datasets, calculate
+  summary statistics, and plot dataset with the generated clusters.
+  \itemize{
+    \item{The main DBSCAN algorithm can be applied using the \code{dbscan()} function.}
+    \item{Summary statistics on the generated clusters can be calculated and displayed through \code{summary()}.}
+    \item{The clusters can be displayed on a 2-D scatter plot using \code{scatter()}.}
+  }
 }
 \author{
-Your Name, email optional.
+Hans Eliezer: eliezehans@myvuw.ac.nz
+}
+\keyword{clustering dbscan}
 
-Maintainer: Your Name <your@email.com>
-}
-\references{
-  This optional section can contain literature or other references for
-  background information.
-}
-\keyword{ package }
-\seealso{
-  Optional links to other man pages
-}
 \examples{
-  \dontrun{
-     ## Optional simple examples of the most important functions
-     ## These can be in \dontrun{} and \donttest{} blocks.   
-  }
+\dontrun{
+blobs <- read.csv('dat/blobs.csv')
+blobs_dbscan <- dbscan(blobs, 0.2, 5)
+}
 }

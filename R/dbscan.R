@@ -26,15 +26,28 @@
 #' considered a core point under the given `eps` and `min_pts` parameters.
 #' 
 #' @details
-#' The most important parameters to set are `min_pts` and `eps`
+#' The most critical parameters to set are `min_pts` and `eps`.
 #' 
-#' If dataset is not yet normalised, it is highly recommended to set `normalise` to true: as a distance-based
-#' algorithm, DBSCAN is still sensitive to features being on varying scales
+#' If dataset is not yet normalised, it is highly recommended to set `normalise` to true, or normalise
+#' the data first separately. As a distance-based algorithm, DBSCAN is sensitive to features being on
+#' varying scales.
 #' 
-#' `border_pts = TRUE` would be equivalent to the original DBSCAN algorithm described by Ester et al.,
-#' while `FALSE` would be equivalent to DBSCAN* described in Campello et al. 2013
+#' `border_pts=TRUE` means border points - points that do not have sufficient number of neighbours by itself
+#' but are neighbours of a core point - are included in a cluster, and is consistent to the original algorithm
+#' as described by Ester et al. (1996). While `FALSE` excludes border points, which is more consistent to the
+#' definition of a cluster having to always have consistent minimum density and is equivalent to hierarchical
+#' DBSCAN described in Campello et al. (2013).
 #' 
 #' @keywords clustering
+#' @references
+#' Ester, Martin, Hans-Peter Kriegel, Jörg Sander, and Xiaowei Xu. 1996. “A Density-Based Algorithm for
+#' Discovering Clusters in Large Spatial Databases with Noise.” In *KDD ’96: Proceedings of the 2nd
+#' International Conference on Knowledge Discovery and Data Mining*, 226–31. Palo Alto, CA, United States:
+#' AAAI Press.
+#' 
+#' Campello, Ricardo J. G. B., Davoud Moulavi and Jörg Sander. 2013. "Density-Based Clustering Based on
+#' Hierarchical Density Estimates." In *PAKDD 2013: Proceedings of the 17th Pacific-Asia Conference on
+#' Knowledge Discovery in Databases, 160-172*. Berlin, Germany: Springer.
 #' @examples
 #' \dontrun{
 #' blobs <- read.csv('blobs.csv')

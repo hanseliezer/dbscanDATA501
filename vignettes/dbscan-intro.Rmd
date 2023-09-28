@@ -1,0 +1,99 @@
+---
+title: "DBSCAN: Introduction & general usage guide"
+output: rmarkdown::html_vignette
+bibliography: 'dbscan-intro-references.bib'
+vignette: >
+  %\VignetteIndexEntry{DBSCAN: Introduction & general usage guide}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  fig.height = 5,
+  fig.width = 7,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+DBSCAN - short for "Density-based Clustering Application with Noise" - is a density-based non-parametric clustering algorithm first proposed by @dbscan-orig. The general idea is that clusters are formed when observations are grouped together in a "dense" manner; this "density" can be measured by how many of them are located within a certain range/distance of each other. There are two inter-related criteria implied by this measurement, and they are the most critical parameters of the algorithm:
+
+* $min\_pts$: minimum number of points required to be found within $\epsilon$ distance
+
+* $\epsilon$: the maximum distance in which to find $min\_pts$ number of points
+    
+Points that fulfil both of this criteria are what is called "core points", as they will form the *core* of the generated clusters. Clusters are then expanded to include other points - called "border points" - which may not fulfil the $min\_pts$ criteria by itself, but is nevertheless within $\epsilon$ distance of a core point. Any remaining points which does not fulfil both criteria will be considered as "noise" - i.e., does not belong to any cluster.
+
+The abstract algorithm of DBSCAN is as follows [@dbscan-revisit]:
+
+1. Compute neighbors of each point, and identify core points.
+
+2. Join neighbouring core points into initial clusters.
+
+3. For non-core points, determine their reachability from a core point.
+
+4. Assign to a cluster if reachable; otherwise assign as noise.
+    
+The two main advantages of DBSCAN are [@dbscan-when]:
+
+1. There is no need to pre-specify the number of clusters to create: core points are automatically found based on the given $min\_pts$ and $\epsilon$, and the number of core point groups will correspond to the eventual created clusters.
+
+2. Ability to find irregularly-shaped clusters: assigning non-core points to a cluster is similar to finding another point that already belong to a cluster, regardless of where they are within ϵ. This is unlike, for example, k-means clustering where points are assigned based on their direct distance to the centroids, leading to clusters that are generally circle-like.
+
+# Usage
+
+```{r setup}
+library(dbscanDATA501)
+```
+
+For this introduction, two 2-D toy datasets will be used:
+
+* `blobs` have observations grouped into two distinct approximately-globular clusters.
+
+    ```{r}
+    blobs <- read.csv('dat/blobs.csv')
+    head(blobs)
+    
+    plot(blobs, pch=19, xlim=c(-15, 10), ylim=c(-10, 15))
+    ```
+
+* `circles` have observations grouped into two hollow circles inside each other.
+
+    ```{r}
+    circles <- read.csv('dat/circles.csv')
+    head(circles)
+    
+    plot(circles, pch=19, xlim=c(-1.1, 1.1), ylim=c(-1.1, 1.1))
+    ```
+
+Now let's apply the DBSCAN algorithm to the `blobs` dataset using the `dbscan()` function. The initial parameters will be set to $min\_pts = 5$ and $\epsilon = 0.2$. This means a cluster will be initiated when at least one point has at least 5 other points within 0.2 units of it's range.
+
+```{r}
+blobs_dbscan <- dbscan(blobs, 0.2, 5)
+```
+
+The `dbscan()` functions returns a few things, but the most important is `cluster_labs`: an integer vector indicating to which cluster each observation belongs to, with 0 indicating noise. Note that the exact numbering of the cluster labels is arbitrary; the important thing is points labelled 1 belong to one cluster, points labelled 2 belong to another cluster, etc.
+
+Now the original data can be plotted with the addition of the newly-formed clusters to display which points belong to which cluster:
+
+```{r}
+plot(blobs, pch=19, xlim=c(-15, 10), ylim=c(-10, 15),
+     col=factor(blobs_dbscan$cluster_labs))
+```
+
+Two distinct clusters have been formed, with noise points in black.
+
+Next, let's do the same thing with `circles` with $\epsilon = 0.1$:
+
+```{r}
+circles_dbscan <- dbscan(circles, 0.1, 5)
+plot(circles, pch=19, xlim=c(-1.1, 1.1), ylim=c(-1.1, 1.1),
+     col=factor(circles_dbscan$cluster_labs))
+```
+
+Two clusters have been generated, with each hollow circle forming it's own cluster
+
+# References

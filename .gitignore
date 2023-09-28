@@ -6,4 +6,6 @@ src/*.o
 src/*.so
 src/*.dll
 inst/doc
-testing
+coba-coba
+papers
+dbscanDATA501-test_plan.Rmd

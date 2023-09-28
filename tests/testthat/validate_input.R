@@ -1,12 +1,17 @@
 classif <- read.csv("../../dat/classif.csv")
 
+# adding column of strings
 classif_str <- classif
 classif_str$X20 <- c(rep("A", 200), rep("B", 300))
+# adding column of booleans
 classif_logi <- classif
 classif_logi$X21 <- c(rep(TRUE, 200), rep(FALSE, 100), rep(TRUE, 200))
 
+# actual distance matrix
 classif_distmat <- as.matrix(dist(classif))
+# right shape, incorrect diagonal
 wrong_distmat <- matrix(rnorm(100), nrow=100, ncol=100)
+# right shape, right diagonal, nonsense content
 nonsense_distmat <- matrix(rnorm(100), nrow=100, ncol=100)
 diag(nonsense_distmat) <- 0
 
@@ -19,19 +24,19 @@ test_that("Verify data argument", {
   expect_error(dbscan(NULL, test_eps, test_min_pts),
                "Please supply a dataset/distance matrix.")
   
-  # can't be empty
+  # can't be an empty dataframe
   expect_error(dbscan(classif['X1' < -1000], test_eps, test_min_pts),
                "Please supply a dataset/distance matrix")
   
-  # data must be a matrix/dataframe
+  # data must be a matrix/dataframe type
   expect_error(dbscan(9, test_eps, test_min_pts),
                "data must be a matrix or data.frame.")
   
-  # data types must be all numeric
+  # data types in dataframe must be all numeric
   expect_error(dbscan(classif_str, test_eps, test_min_pts),
                "data must consist entirely of numeric type.")
   
-  # data types must be all numeric
+  # data types in dataframe must be all numeric
   expect_error(dbscan(classif_logi, test_eps, test_min_pts),
                "data must consist entirely of numeric type.")
   
@@ -54,20 +59,20 @@ test_that("Verify min_pts and eps arguments", {
   expect_error(dbscan(classif, classif, test_min_pts),
                "Both min_pts and eps must be integers equal or bigger than 0.")
   
-  # both are numbers
+  # both are numeric
   expect_silent(dbscan(classif, test_eps, test_min_pts))
   
-  # both are numbers
+  # both are integers
   expect_silent(dbscan(classif, 3L, 4L))
   
-  # both are numbers
+  # both are numeric, should still work but return everything as noise
   expect_silent(dbscan(classif, 0, 0))
   
 })
 
 test_that("Verify metric argument", {
   
-  # unavailable distace metric
+  # unavailable distance metric
   expect_error(dbscan(classif, test_eps, test_min_pts, metric='chebyshev'),
                "Options for distance metric are 'euclidean', 'manhattan' or 'precomputed'.")
   
@@ -81,7 +86,8 @@ test_that("Verify metric argument", {
 
 test_that("Verify shape of data/distance matrix", {
 
-  # if distance is precomputed, data must already be a distance matrix
+  # if distance is precomputed, data must already be a distance matrix/have the shape of a
+  # distance matrix
   expect_error(dbscan(classif, test_eps, test_min_pts, metric='precomputed'),
                "Distance matrix must be of size n x n.")
   
