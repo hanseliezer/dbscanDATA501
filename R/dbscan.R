@@ -114,7 +114,7 @@ dbscan <- function(data, eps, min_pts, metric="euclidean", normalise=TRUE, borde
   clust_lab <- replace(clust_lab, is.na(clust_lab), 0)
   rm(dist_mat)
   
-  result <- def_dbscan(data, eps, min_pts, metric, border_pts, clust_lab, duration)
+  result <- def_dbscan(data, eps, min_pts, metric, normalise, border_pts, clust_lab, duration)
   return(result)
 }
 

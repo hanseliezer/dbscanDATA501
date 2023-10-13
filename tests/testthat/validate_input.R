@@ -48,16 +48,27 @@ test_that("Verify data argument", {
 test_that("Verify min_pts and eps arguments", {
   
   # can't be strings
-  expect_error(dbscan(classif, "test_eps", "test_min_pts"),
-               "Both min_pts and eps must be integers equal or bigger than 0.")
+  expect_error(dbscan(classif, "9", test_min_pts),
+               "eps must be integers equal or bigger than 0.")
+  expect_error(dbscan(classif, test_eps, "8"),
+               "min_pts must be integers equal or bigger than 0.")
   
   # can't be logical
-  expect_error(dbscan(classif, FALSE, TRUE),
-               "Both min_pts and eps must be integers equal or bigger than 0.")
+  expect_error(dbscan(classif, FALSE, test_min_pts),
+               "eps must be integers equal or bigger than 0.")
+  expect_error(dbscan(classif, test_eps, TRUE),
+               "min_pts must be integers equal or bigger than 0.")
   
-  # can't be a dataframe
+  # can't be dataframes
   expect_error(dbscan(classif, classif, test_min_pts),
-               "Both min_pts and eps must be integers equal or bigger than 0.")
+               "eps must be integers equal or bigger than 0.")
+  expect_error(dbscan(classif, test_eps, classif_str),
+               "min_pts must be integers equal or bigger than 0.")
+  
+  # eps is checked first before min_pts. so if both params are wrong, the message
+  # will be related to eps
+  expect_error(dbscan(classif, "888", TRUE),
+               "eps must be integers equal or bigger than 0.")
   
   # both are numeric
   expect_silent(dbscan(classif, test_eps, test_min_pts))
@@ -104,11 +115,16 @@ test_that("Verify normalise and border_pts arguments", {
 
   # normalise must be logical
   expect_error(dbscan(classif, test_eps, test_min_pts, normalise=9),
-               "Both normalise and borderPoints must be of type logical.")
+               "normalise must be TRUE/FALSE.")
   
   # border_pts must be logical
   expect_error(dbscan(classif, test_eps, test_min_pts, border_pts="peep"),
-               "Both normalise and borderPoints must be of type logical.")
+               "border_pts must be TRUE/FALSE.")
+  
+  # same as eps/min_pts, normalise is checked first, so if both normalise and
+  # border_pts are wrong, error for normalise would appear
+  expect_error(dbscan(classif, test_eps, test_min_pts, border_pts="peep", normalise=55),
+               "normalise must be TRUE/FALSE.")
 
   # correctly set to logical
   expect_silent(dbscan(classif, test_eps, test_min_pts, normalise=FALSE, border_pts=FALSE))

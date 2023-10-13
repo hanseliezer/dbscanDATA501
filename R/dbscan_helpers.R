@@ -13,9 +13,23 @@ dbscan_input_checks <- function(data, eps, min_pts, metric, normalise, border_pt
     stop("data must consist entirely of numeric type.")
   }
   
-  # checking min_pts and eps: both must be numeric and > 0
-  if (!all(sapply(c(eps, min_pts), is.numeric)) | any(eps < 0, min_pts < 0)) {
-    stop("Both min_pts and eps must be integers equal or bigger than 0.")
+  # checking min_pts and eps: both must be numeric and > 0. tests for these two now
+  # split up to make the errors clearer
+  # this first if would capture cases when eps are not scalars (is.numeric alone is
+  # not enough as matrices are considered TRUE)
+  if (!(is.numeric(eps) && length(eps) == 1)) {
+    stop("eps must be integers equal or bigger than 0.")
+  }
+  # second case is if eps is indeed scalar but less than 0
+  else if (is.numeric(eps) && eps < 0) {
+    stop("eps must be integers equal or bigger than 0.")
+  }
+  
+  if (!(is.numeric(min_pts) && length(min_pts) == 1)) {
+    stop("min_pts must be integers equal or bigger than 0.")
+  }
+  else if (is.numeric(min_pts) && min_pts < 0) {
+    stop("min_pts must be integers equal or bigger than 0.")
   }
   
   # check distance metric: must be one of the three options
@@ -31,18 +45,23 @@ dbscan_input_checks <- function(data, eps, min_pts, metric, normalise, border_pt
       stop("Distance matrix must have all diagonal elements be 0.")
     }
   }
-
-  if (!all(sapply(c(normalise, border_pts), is.logical))) {
-    stop("Both normalise and borderPoints must be of type logical.")
+  
+  # checking normalise and border_pts: should be boolean
+  if (!is.logical(normalise)) {
+    stop("normalise must be TRUE/FALSE.")
+  }
+  if (!is.logical(border_pts)) {
+    stop("border_pts must be TRUE/FALSE.")
   }
 }
 
 # constructor function of a `dbscan` class
-def_dbscan <- function(data, eps, min_pts, metric, border_pts, cluster_labs, duration) {
+def_dbscan <- function(data, eps, min_pts, metric, normalise, border_pts, cluster_labs, duration) {
   dbscan_list <- list("dataset"=data,
                       "eps"=eps,
                       "min_pts"=min_pts,
                       "metric"=metric,
+                      "normalise"=normalise,
                       "border_pts"=border_pts,
                       "cluster_labs"=cluster_labs,
                       "fitting_time"=duration

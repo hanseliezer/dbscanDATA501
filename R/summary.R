@@ -7,7 +7,7 @@
 #' 
 #' @details
 #' There are three sections to the summary:
-#' * Parameters used: `min_pts`, `eps` and `metric`.
+#' * Parameters used: `min_pts`, `eps`, `metric`, `normalise` and `border_pts`.
 #' * Clustering results: total fitting time in seconds and number of clusters generated (excluding noise).
 #' * Clustering quality: four internal validation metrics are provided; connectivity, mean silhouette,
 #' Dunn index, and CDbw.
@@ -29,19 +29,15 @@ summary.dbscan <- function(obj) {
   clust_nums <- obj$cluster_labs[obj$cluster_labs != 0]
   n_clusters <- if (length(unique(clust_nums)) > 0) length(unique(clust_nums)) else 0
   
-  score_conn <- clValid::connectivity(Data=obj$dataset,
-                                      clusters=obj$cluster_labs)
-  silh <- cluster::silhouette(x=obj$cluster_labs,
-                              dist=dist(obj$dataset))
-  score_silh <- mean(silh[, 'sil_width'])
-  score_dunn <- clValid::dunn(Data=obj$dataset,
-                              clusters=obj$cluster_labs)
-  score_cdbw <- fpc::cdbw(x=obj$dataset,
-                          clustering=obj$cluster_labs)$cdbw
+  score_conn <- connectivity_wrapper(obj$dataset, obj$cluster_labs)
+  score_silh <- silhouette_wrapper(obj$dataset, obj$cluster_labs)
+  score_dunn <- dunn_wrapper(obj$dataset, obj$cluster_labs)
+  score_cdbw <- cdbw_wrapper(obj$dataset, obj$cluster_labs)
   
   print_list <- list('min_pts'=obj$min_pts,
                      'eps'=obj$eps,
                      'metric'=obj$metric,
+                     'normalise'=obj$normalise,
                      'border_pts'=obj$border_pts,
                      'fitting_time'=obj$fitting_time,
                      'n_clusters'=n_clusters,
@@ -62,16 +58,17 @@ print.summary.dbscan <-function(obj) {
   cat("Parameters:\n")
   cat("eps:", obj$eps, "\n")
   cat("min_pts:", obj$min_pts, "\n")
-  cat("border_pts:", obj$border_pts, "\n")
-  cat(paste0("Distance metric: ", obj$metric, "\n\n"))
+  cat("metric:", obj$metric, "\n")
+  cat("normalise:", obj$normalise, "\n")
+  cat(paste0("border_pts: ", obj$border_pts, "\n\n"))
   
-  cat(paste0("Running time (s): ", round(obj$fitting_time, 5), "\n"))
+  cat("Running time (s):", round(obj$fitting_time, 5), "\n")
   cat(paste0("Number of generated clusters (excl. noise): ", obj$n_clusters, "\n\n"))
   
   cat("Clustering quality metrics:\n")
-  cat(paste0("Connectivity: ", round(obj$score_conn, 5), "\n"))
-  cat(paste0("Silhouette width: ", round(obj$score_silh, 5), "\n"))
-  cat(paste0("Dunn index: ", round(obj$score_dunn, 5), "\n"))
+  cat("Connectivity (lower better):", round(obj$score_conn, 5), "\n")
+  cat("Silhouette width:", round(obj$score_silh, 5), "\n")
+  cat("Dunn index (higher better):", round(obj$score_dunn, 5), "\n")
   cat(paste0("CDbw: ", round(obj$score_cdbw, 5), "\n\n"))
   cat("NOTE: Caution must be taken when interpreting connectivity, silhouette and\nDunn index for non-globular clusters.")
 }
