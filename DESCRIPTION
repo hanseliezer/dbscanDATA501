@@ -1,7 +1,7 @@
 Package: dbscanDATA501
 Type: Package
 Title: Density-based Spatial Clustering of Applications with Noise (DBSCAN)
-Version: 0.1
+Version: 0.2
 Date: 2023-09-12
 Authors@R:
     person("Hans", "Eliezer", , "eliezehans@myvuw.ac.nz", role = c("aut", "cre"),
@@ -23,3 +23,6 @@ Suggests:
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
+Depends: 
+    R (>= 2.10)
+LazyData: true

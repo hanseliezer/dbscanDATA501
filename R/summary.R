@@ -7,7 +7,7 @@
 #' 
 #' @details
 #' There are three sections to the summary:
-#' * Parameters used: `min_pts`, `eps`, `metric`, `normalise` and `border_pts`.
+#' * Parameters used in algorithm fitting: `min_pts`, `eps`, `metric`, `normalise` and `border_pts`.
 #' * Clustering results: total fitting time in seconds and number of clusters generated (excluding noise).
 #' * Clustering quality: four internal validation metrics are provided; connectivity, mean silhouette,
 #' Dunn index, and CDbw.
@@ -24,6 +24,7 @@
 #' blobs_clust <- dbscan(blobs, 0.2, 5)
 #' summary(blobs_clust)
 #' }
+#' @rdname summary
 #' @export
 summary.dbscan <- function(obj) {
   clust_nums <- obj$cluster_labs[obj$cluster_labs != 0]
@@ -67,8 +68,50 @@ print.summary.dbscan <-function(obj) {
   
   cat("Clustering quality metrics:\n")
   cat("Connectivity (lower better):", round(obj$score_conn, 5), "\n")
-  cat("Silhouette width:", round(obj$score_silh, 5), "\n")
+  cat("Mean silhouette width:", round(obj$score_silh, 5), "\n")
   cat("Dunn index (higher better):", round(obj$score_dunn, 5), "\n")
   cat(paste0("CDbw: ", round(obj$score_cdbw, 5), "\n\n"))
-  cat("NOTE: Caution must be taken when interpreting connectivity, silhouette and\nDunn index for non-globular clusters.")
+  cat("NOTE: Caution must be taken when interpreting connectivity, mean silhouette width\nandDunn index for non-globular clusters.")
+}
+
+##############################################################################
+
+# helper functions
+# tryCatch functions to prevent possible errors originating from the score functions as a result
+# from weird clustering results from stopping summary() altogether. in case of any errors/warnings,
+# return NaN
+connectivity_wrapper <- function(data, labs) {
+  score <- tryCatch(clValid::connectivity(Data=data, clusters=labs),
+                    error=function(e) { return(NaN) },
+                    warning=function(w) { return(NaN) })
+  
+  return(score)
+}
+
+silhouette_wrapper <- function(data, labs) {
+  dist_mat <- dist(data)
+  silh <- tryCatch(cluster::silhouette(x=labs, dist=dist_mat),
+                   error=function(e) { return(NaN) },
+                   warning=function(w) { return(NaN) })
+  
+  # silhouette returns NA for 'trivial clustering' (either only 1 or all N clusters)
+  # else it will return a list, so check length of returned object
+  score <- if (length(silh) > 1) mean(silh[, 'sil_width']) else NaN
+  return(score)
+}
+
+dunn_wrapper <- function(data, labs) {
+  score <- tryCatch(clValid::dunn(Data=data, clusters=labs),
+                    error=function(e) { return(NaN) },
+                    warning=function(w) { return(NaN) })
+  
+  return(score)
+}
+
+cdbw_wrapper <- function(data, labs) {
+  score <- tryCatch(fpc::cdbw(x=data, clustering=labs)$cdbw,
+                    error=function(e) { return(NaN) },
+                    warning=function(w) { return(NaN) })
+  
+  return(score)
 }
