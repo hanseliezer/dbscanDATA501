@@ -1,16 +1,17 @@
 #' Demonstration of DBSCAN on toy datasets
 #' 
 #' @description
-#' Applies DBSCAN to 2-D toy datasets and displays the results. `blobs` represents points collected into two
-#' clearly-separated approximately-globular clusters, and `circles` represents points collected into two hollow 
-#' circles inside each other. Three different algorithms will be fitted into the dataset, each with different
-#' `min_pts` and `eps` parameters, clustering summaries printed, and scatter plots drawn to display the resulting
-#' clusters to demonstrate the impact of the different parameters.
+#' Applies DBSCAN to 2-D toy datasets and displays the results. `blobs` represents points collected into
+#' two clearly-separated approximately-globular clusters, and `circles` represents points collected into
+#' two hollow  circles inside each other. Three different algorithms will be fitted into the dataset,
+#' each with different `min_pts` and `eps` parameters, clustering summaries printed, and scatter plots
+#' drawn to display the resulting clusters to demonstrate the impact of the different parameters.
 #' 
 #' @returns There are two parts:
 #' \itemize{
-#'  \item Printed summary table of clustering results: number of clusters generated (excluding noise), and the four
-#'  validation metrics used in `summary()`: connectivity, mean silhouette width, Dunn index, and CDbw.
+#'  \item Printed summary table of clustering results: number of clusters generated (excluding noise),
+#'  and the four validation metrics used in `summary()`: connectivity, mean silhouette width, Dunn index,
+#'  and CDbw.
 #'  \item Scatter plots of the data, with generated clusters displayed as different colours.
 #' }
 #' 
@@ -76,7 +77,7 @@ demo <- function(data, eps_list, min_pts_list) {
   cluster_2 <- demo_summary(data, eps_list[2], min_pts_list[2])
   cluster_3 <- demo_summary(data, eps_list[3], min_pts_list[3])
   
-  # clustering summary to be printed
+  # table of summary values to be printed
   cluster_summary <- data.frame(n_cluster=c(cluster_1$n_clusters,
                                             cluster_2$n_clusters,
                                             cluster_3$n_clusters),
@@ -92,26 +93,34 @@ demo <- function(data, eps_list, min_pts_list) {
                                 cdbw=c(cluster_1$score_cdbw,
                                        cluster_2$score_cdbw,
                                        cluster_3$score_cdbw))
+  # give proper column names
   names(cluster_summary) <- c("No. clusters (excl. noise)", "Connectivity", "Mean silhouette width",
                               "Dunn index", "CDbw")
+  # parameter values as row names
   param_names <- c(paste0("eps=", eps_list[1], ", min_pts=", min_pts_list[1]),
                    paste0("eps=", eps_list[2], ", min_pts=", min_pts_list[2]),
                    paste0("eps=", eps_list[3], ", min_pts=", min_pts_list[3]))
   rownames(cluster_summary) <- param_names
   
+  # print a clean table
   cat("Clustering summary:\n")
   print(cluster_summary)
   
   par(mar=c(5.1, 4, 4, 5.25), xpd=TRUE)
-  plot(data$X, data$Y, col=cluster_1$plot_classes, pch=20, xlab="X", ylab="Y", main=param_names[1])
+  # use plot.default rather than plot.dbscanDATA501 as to give it a different axes labels
+  # and title
+  plot.default(data$X, data$Y, col=cluster_1$plot_classes, pch=20,
+               xlab="X", ylab="Y", main=param_names[1])
   legend("topleft", inset=c(1, 0), legend=cluster_1$plot_classes_legend,
          col=factor(cluster_1$plot_classes_legend), pch=20)
   
-  plot(data$X, data$Y, col=cluster_2$plot_classes, pch=20, xlab="X", ylab="Y", main=param_names[2])
+  plot.default(data$X, data$Y, col=cluster_2$plot_classes, pch=20,
+               xlab="X", ylab="Y", main=param_names[2])
   legend("topleft", inset=c(1, 0), legend=cluster_2$plot_classes_legend,
          col=factor(cluster_2$plot_classes_legend), pch=20)
   
-  plot(data$X, data$Y, col=cluster_3$plot_classes, pch=20, xlab="X", ylab="Y", main=param_names[3])
+  plot.default(data$X, data$Y, col=cluster_3$plot_classes, pch=20,
+               xlab="X", ylab="Y", main=param_names[3])
   legend("topleft", inset=c(1, 0), legend=cluster_3$plot_classes_legend,
          col=factor(cluster_3$plot_classes_legend), pch=20)
 }

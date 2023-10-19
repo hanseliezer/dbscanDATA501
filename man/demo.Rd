@@ -12,17 +12,18 @@ demo_circles()
 \value{
 There are two parts:
 \itemize{
-\item Printed summary table of clustering results: number of clusters generated (excluding noise), and the four
-validation metrics used in \code{summary()}: connectivity, mean silhouette width, Dunn index, and CDbw.
+\item Printed summary table of clustering results: number of clusters generated (excluding noise),
+and the four validation metrics used in \code{summary()}: connectivity, mean silhouette width, Dunn index,
+and CDbw.
 \item Scatter plots of the data, with generated clusters displayed as different colours.
 }
 }
 \description{
-Applies DBSCAN to 2-D toy datasets and displays the results. \code{blobs} represents points collected into two
-clearly-separated approximately-globular clusters, and \code{circles} represents points collected into two hollow
-circles inside each other. Three different algorithms will be fitted into the dataset, each with different
-\code{min_pts} and \code{eps} parameters, clustering summaries printed, and scatter plots drawn to display the resulting
-clusters to demonstrate the impact of the different parameters.
+Applies DBSCAN to 2-D toy datasets and displays the results. \code{blobs} represents points collected into
+two clearly-separated approximately-globular clusters, and \code{circles} represents points collected into
+two hollow  circles inside each other. Three different algorithms will be fitted into the dataset,
+each with different \code{min_pts} and \code{eps} parameters, clustering summaries printed, and scatter plots
+drawn to display the resulting clusters to demonstrate the impact of the different parameters.
 }
 \examples{
 \dontrun{

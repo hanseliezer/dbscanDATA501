@@ -32,15 +32,16 @@ is_core_point(data, eps, min_pts, metric = "euclidean", normalise = TRUE)
 Defaults to \code{TRUE}.}
 }
 \value{
-\code{dbscan()} returns a list object of class \code{dbscan} with the following components:
+\code{dbscan()} returns a list object of class \code{dbscanDATA501} with the following components:
 
-\item{dataset }{ Original dataset being clustered.}
-\item{eps }{ Value of \code{eps} parameter used.}
-\item{min_pts }{ Value of \code{min_pts} parameter used.}
-\item{metric }{ Distance metric used.}
-\item{border_pts }{ Whether border points are clustered.}
-\item{cluster_labs }{ Integer vector with indicating cluster membership. Noise points are assigned 0.}
-\item{fitting_time }{ Total algorithm fitting time in seconds.}
+\item{dataset }{Dataset being clustered.}
+\item{eps }{Value of \code{eps} parameter used.}
+\item{min_pts }{Value of \code{min_pts} parameter used.}
+\item{metric }{Distance metric used.}
+\item{normalise }{Whether dataset is normalised prior to fitting.}
+\item{border_pts }{Whether border points are clustered.}
+\item{cluster_labs }{Integer vector indicating cluster membership. Noise points are assigned 0.}
+\item{fitting_time }{Total algorithm fitting time in seconds.}
 
 \code{is_core_point()} returns a logical vector indicating whether each observation in the dataset would be
 considered a core point under the given \code{eps} and \code{min_pts} parameters.
@@ -49,32 +50,45 @@ considered a core point under the given \code{eps} and \code{min_pts} parameters
 Applies the DBSCAN algorithm to a given dataset.
 }
 \details{
-The most critical parameters to set are \code{min_pts} and \code{eps}.
+The most critical parameters to choose are \code{min_pts} and \code{eps}. The higher the numbers, the higher the
+bar is for a cluster to be initiated. The best values will be dependent on the dataset itself
+and domain knowledge, and it is recommended to try a few different combinations of values before
+proceeding with analysis. A proposed heuristic to get an initial \code{min_pts} guess is dataset
+dimensionality multiplied by 2, while a starting value for \code{eps} can be found by constructing a sorted
+\eqn{k}-distance plot based on a chosen \code{min_pts} and finding the "valley" (Sander 1998).
 
-If dataset is not yet normalised, it is highly recommended to set \code{normalise} to true, or normalise
+The choice of \code{metric} is also problem-dependent. If neither Euclidean and Manhattan distances are
+appropriate, a custom distance matrix can always be calculated before supplying it to the function
+and specifying \code{metric = precomputed}.
+
+If dataset is not yet normalised, it is highly recommended to set \code{normalise = TRUE}, or normalise
 the data first separately. As a distance-based algorithm, DBSCAN is sensitive to features being on
 varying scales.
 
-\code{border_pts=TRUE} means border points - points that do not have sufficient number of neighbours by itself
-but are neighbours of a core point - are included in a cluster, and is consistent to the original algorithm
-as described by Ester et al. (1996). While \code{FALSE} excludes border points, which is more consistent to the
-definition of a cluster having to always have consistent minimum density and is equivalent to hierarchical
-DBSCAN described in Campello et al. (2013).
+\code{border_pts=TRUE} means border points - points that do not have sufficient number of neighbours by
+itself but are neighbours of a core point - are included in a cluster, and is consistent to the
+original algorithm as described by Ester et al. (1996). While \code{FALSE} excludes border points, which
+is more consistent to the definition of a cluster having to always have a certain minimum density,
+and is equivalent to hierarchical DBSCAN described in Campello et al. (2013).
 }
 \examples{
 \dontrun{
-blobs <- read.csv('blobs.csv')
+data(blobs)
 dbscan(blobs, 5, 0.2)
 }
 }
 \references{
+Sander, J., Ester, M., Kriegel, HP. et al. 1998. "Density-Based Clustering in Spatial Databases: The
+Algorithm GDBSCAN and Its Applications." \emph{Data Mining and Knowledge Discovery} 2: 169–194.
+https://doi.org/10.1023/A:1009745219419
+
 Ester, Martin, Hans-Peter Kriegel, Jörg Sander, and Xiaowei Xu. 1996. “A Density-Based Algorithm for
 Discovering Clusters in Large Spatial Databases with Noise.” In \emph{KDD ’96: Proceedings of the 2nd
-International Conference on Knowledge Discovery and Data Mining}, 226–31. Palo Alto, CA, United States:
-AAAI Press.
+International Conference on Knowledge Discovery and Data Mining}, pp. 226–31. Palo Alto, CA, United
+States: AAAI Press.
 
 Campello, Ricardo J. G. B., Davoud Moulavi and Jörg Sander. 2013. "Density-Based Clustering Based on
 Hierarchical Density Estimates." In \emph{PAKDD 2013: Proceedings of the 17th Pacific-Asia Conference on
-Knowledge Discovery in Databases, 160-172}. Berlin, Germany: Springer.
+Knowledge Discovery in Databases}, pp. 160-172. Berlin, Germany: Springer.
 }
 \keyword{clustering}

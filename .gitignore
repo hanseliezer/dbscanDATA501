@@ -8,5 +8,4 @@ src/*.dll
 inst/doc
 coba-coba
 papers
-dbscanDATA501-test_plan.Rmd
-dbscanDATA501-test_plan.pdf
+tests/dbscanDATA501-test_plan.Rmd

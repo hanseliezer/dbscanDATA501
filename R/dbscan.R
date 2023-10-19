@@ -12,45 +12,60 @@
 #' @param border_pts Logical; whether "border points" should be included in a cluster.
 #' Defaults to `TRUE`.
 #' 
-#' @returns `dbscan()` returns a list object of class `dbscan` with the following components:
+#' @returns `dbscan()` returns a list object of class `dbscanDATA501` with the following components:
 #' 
-#' \item{dataset }{ Original dataset being clustered.}
-#' \item{eps }{ Value of `eps` parameter used.}
-#' \item{min_pts }{ Value of `min_pts` parameter used.}
-#' \item{metric }{ Distance metric used.}
-#' \item{border_pts }{ Whether border points are clustered.}
-#' \item{cluster_labs }{ Integer vector with indicating cluster membership. Noise points are assigned 0.}
-#' \item{fitting_time }{ Total algorithm fitting time in seconds.}
+#' \item{dataset }{Dataset being clustered.}
+#' \item{eps }{Value of `eps` parameter used.}
+#' \item{min_pts }{Value of `min_pts` parameter used.}
+#' \item{metric }{Distance metric used.}
+#' \item{normalise }{Whether dataset is normalised prior to fitting.}
+#' \item{border_pts }{Whether border points are clustered.}
+#' \item{cluster_labs }{Integer vector indicating cluster membership. Noise points are assigned 0.}
+#' \item{fitting_time }{Total algorithm fitting time in seconds.}
 #' 
 #' `is_core_point()` returns a logical vector indicating whether each observation in the dataset would be
 #' considered a core point under the given `eps` and `min_pts` parameters.
 #' 
 #' @details
-#' The most critical parameters to set are `min_pts` and `eps`.
+#' The most critical parameters to choose are `min_pts` and `eps`. The higher the numbers, the higher the
+#' bar is for a cluster to be initiated. The best values will be dependent on the dataset itself
+#' and domain knowledge, and it is recommended to try a few different combinations of values before
+#' proceeding with analysis. A proposed heuristic to get an initial `min_pts` guess is dataset
+#' dimensionality multiplied by 2, while a starting value for `eps` can be found by constructing a sorted
+#' \eqn{k}-distance plot based on a chosen `min_pts` and finding the "valley" (Sander 1998).
 #' 
-#' If dataset is not yet normalised, it is highly recommended to set `normalise` to true, or normalise
+#' The choice of `metric` is also problem-dependent. If neither Euclidean and Manhattan distances are
+#' appropriate, a custom distance matrix can always be calculated before supplying it to the function
+#' and specifying `metric = precomputed`.
+#' 
+#' If dataset is not yet normalised, it is highly recommended to set `normalise = TRUE`, or normalise
 #' the data first separately. As a distance-based algorithm, DBSCAN is sensitive to features being on
 #' varying scales.
 #' 
-#' `border_pts=TRUE` means border points - points that do not have sufficient number of neighbours by itself
-#' but are neighbours of a core point - are included in a cluster, and is consistent to the original algorithm
-#' as described by Ester et al. (1996). While `FALSE` excludes border points, which is more consistent to the
-#' definition of a cluster having to always have consistent minimum density and is equivalent to hierarchical
-#' DBSCAN described in Campello et al. (2013).
+#' `border_pts=TRUE` means border points - points that do not have sufficient number of neighbours by
+#' itself but are neighbours of a core point - are included in a cluster, and is consistent to the
+#' original algorithm as described by Ester et al. (1996). While `FALSE` excludes border points, which
+#' is more consistent to the definition of a cluster having to always have a certain minimum density,
+#' and is equivalent to hierarchical DBSCAN described in Campello et al. (2013).
 #' 
 #' @keywords clustering
 #' @references
+#' Sander, J., Ester, M., Kriegel, HP. et al. 1998. "Density-Based Clustering in Spatial Databases: The
+#' Algorithm GDBSCAN and Its Applications." *Data Mining and Knowledge Discovery* 2: 169–194.
+#' https://doi.org/10.1023/A:1009745219419
+#' 
 #' Ester, Martin, Hans-Peter Kriegel, Jörg Sander, and Xiaowei Xu. 1996. “A Density-Based Algorithm for
 #' Discovering Clusters in Large Spatial Databases with Noise.” In *KDD ’96: Proceedings of the 2nd
-#' International Conference on Knowledge Discovery and Data Mining*, 226–31. Palo Alto, CA, United States:
-#' AAAI Press.
+#' International Conference on Knowledge Discovery and Data Mining*, pp. 226–31. Palo Alto, CA, United
+#' States: AAAI Press.
 #' 
 #' Campello, Ricardo J. G. B., Davoud Moulavi and Jörg Sander. 2013. "Density-Based Clustering Based on
 #' Hierarchical Density Estimates." In *PAKDD 2013: Proceedings of the 17th Pacific-Asia Conference on
-#' Knowledge Discovery in Databases, 160-172*. Berlin, Germany: Springer.
+#' Knowledge Discovery in Databases*, pp. 160-172. Berlin, Germany: Springer.
+#' 
 #' @examples
 #' \dontrun{
-#' blobs <- read.csv('blobs.csv')
+#' data(blobs)
 #' dbscan(blobs, 5, 0.2)
 #' }
 #' @rdname dbscan
@@ -152,6 +167,10 @@ dbscan_input_checks <- function(data, eps, min_pts, metric, normalise, border_pt
   else if (!is.matrix(data) & !is.data.frame(data)) {
     stop("data must be a matrix or data.frame.")
   }
+  # checking data: cannot contain any NAs/NaNs
+  else if (any(is.na(data))) {
+    stop("data must not contain any 'NA's/'NaN's.")
+  }
   # checking data: must be all numeric
   else if (!all(sapply(data, is.numeric))) {
     stop("data must consist entirely of numeric type.")
@@ -212,6 +231,6 @@ def_dbscan <- function(data, eps, min_pts, metric, normalise, border_pts, cluste
   )
   
   dbscan_obj <- structure(dbscan_list,
-                          class="dbscan")
+                          class="dbscanDATA501")
   return(dbscan_obj)
 }

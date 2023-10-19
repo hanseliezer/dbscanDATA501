@@ -25,7 +25,7 @@ DBSCAN - short for "Density-based Clustering Application with Noise" - is a dens
 
 * $\epsilon$: the maximum distance in which to find $min\_pts$ number of points
     
-Points that fulfil both of this criteria are what is called "core points", as they will form the *core* of the generated clusters. Clusters are then expanded to include other points - called "border points" - which may not fulfil the $min\_pts$ criteria by itself, but is nevertheless within $\epsilon$ distance of a core point. Any remaining points which does not fulfil both criteria will be considered as "noise" - i.e., does not belong to any cluster.
+Points that fulfil both of this criteria are what is called "core points", as they will form the *core* of the generated clusters. Clusters are then expanded to include other points - called "border points" - which may not fulfil the $min\_pts$ criteria by itself, but is nevertheless within $\epsilon$ distance of a core point. Any remaining points which fulfill neither of these criteria will be considered as "noise" - i.e., they do not belong to any cluster.
 
 The abstract algorithm of DBSCAN is as follows [@dbscan-revisit]:
 
@@ -49,25 +49,29 @@ The two main advantages of DBSCAN are [@dbscan-when]:
 library(dbscanDATA501)
 ```
 
-For this introduction, two 2-D toy datasets will be used:
+To demonstrate basic usage of this package, two 2-D toy datasets have been created using `scikit-learn` in Python and supplied as part of the package by default:
 
-* `blobs` have observations grouped into two distinct approximately-globular clusters.
+* `blobs` have observations grouped into two distinct approximately-globular clusters [@sklearn-make-blobs].
 
     ```{r}
-    blobs <- read.csv('dat/blobs.csv')
+    data(blobs)
     head(blobs)
     
-    plot(blobs, pch=19, xlim=c(-15, 10), ylim=c(-10, 15))
+    plot(blobs, pch=20,
+         main="Blobs")
     ```
 
-* `circles` have observations grouped into two hollow circles inside each other.
+* `circles` have observations grouped into two hollow circles inside each other [@sklearn-make-circles].
 
     ```{r}
-    circles <- read.csv('dat/circles.csv')
+    data(circles)
     head(circles)
     
-    plot(circles, pch=19, xlim=c(-1.1, 1.1), ylim=c(-1.1, 1.1))
+    plot(circles, pch=20,
+         main="Circles")
     ```
+
+## Applying the algorithm
 
 Now let's apply the DBSCAN algorithm to the `blobs` dataset using the `dbscan()` function. The initial parameters will be set to $min\_pts = 5$ and $\epsilon = 0.2$. This means a cluster will be initiated when at least one point has at least 5 other points within 0.2 units of it's range.
 
@@ -75,25 +79,56 @@ Now let's apply the DBSCAN algorithm to the `blobs` dataset using the `dbscan()`
 blobs_dbscan <- dbscan(blobs, 0.2, 5)
 ```
 
-The `dbscan()` functions returns a few things, but the most important is `cluster_labs`: an integer vector indicating to which cluster each observation belongs to, with 0 indicating noise. Note that the exact numbering of the cluster labels is arbitrary; the important thing is points labelled 1 belong to one cluster, points labelled 2 belong to another cluster, etc.
+The `dbscan()` functions returns a few things, but the most important is `cluster_labs`: an integer vector indicating to which cluster each observation belongs to, with 0 representing noise. Note that the exact numbering of the cluster labels is arbitrary; the important thing is points labelled 1 belong to one cluster, points labelled 2 belong to another cluster, etc.
 
-Now the original data can be plotted with the addition of the newly-formed clusters to display which points belong to which cluster:
+Now the original data can be plotted with the addition of the newly-formed clusters to display what they visually look like. To make this plot, let's use `plot()`, feeding it the returned object from `dbscan()`.
 
 ```{r}
-plot(blobs, pch=19, xlim=c(-15, 10), ylim=c(-10, 15),
-     col=factor(blobs_dbscan$cluster_labs))
+plot(blobs_dbscan,
+     xlab="X", ylab="Y", main="Blobs: clustered")
 ```
 
-Two distinct clusters have been formed, with noise points in black.
+Two distinct clusters have been formed, with noise points in light green.
 
 Next, let's do the same thing with `circles` with $\epsilon = 0.1$:
 
 ```{r}
 circles_dbscan <- dbscan(circles, 0.1, 5)
-plot(circles, pch=19, xlim=c(-1.1, 1.1), ylim=c(-1.1, 1.1),
-     col=factor(circles_dbscan$cluster_labs))
+plot(circles_dbscan,
+     xlab="X", ylab="Y", main="Circles: clustered")
 ```
 
-Two clusters have been generated, with each hollow circle forming it's own cluster
+Two clusters have been generated, with each hollow circle forming it's own cluster and one single point assigned as noise on the left.
+
+## Summarising the results
+
+Aside from plotting, the quality of the clustering results can also be determined using validation metrics. The general principle of determining whether clusters are "good" or not is to assess their compactness and separability: compactness looks at how "similar" points assigned to one cluster are, while separability looks at how "dissimilar" points assigned to different clusters are, with the aim of clustering being to maximise both. Most validation metrics returns a single value that combines these two measures in some way.
+
+In this package, the `summary()` function is available to summarise the returned clusters and calculate different validation metrics. Let's apply it to the clustering done to `blobs`:
+
+```{r}
+summary(blobs_dbscan)
+```
+
+There are three parts to this printed summary:
+
+* List of all the parameters used in the initial `dbscan()` call.
+
+* Running time of algorithm application, and count of generated clusters excluding noise.
+
+* Four different clustering validation metrics:
+
+    * Connectivity: Proportion of a point's $k$ nearest neighbours that does *not* belong to the same cluster as that point [@connectivity]. This measures the degree of 'connectedness' of the clusters. Value range is $[0, \infty]$ and should be minimised.
+    
+    * Mean silhouette width: simple mean of all points' silhouette values, where the silhouette values
+    are defined as the distance of each point to all others in the same cluster, subtracted by the
+    minimum average distance of that point to all points in another cluster [@silhouette]. This measures the degree of confidence that a point has been assigned to the "correct" cluster. Value range is between $[-1, 1]$ and should be maximised.
+    
+    * Dunn index: Ratio of the smallest distance between observations not in the same cluster, to the largest intra-cluster distance [@dunn-index]. The numerator represents cluster separability and the denominator represents compactness. Value range is $[0, \infty]$ and should be maximised.
+    
+    * CDbw (composed density between and within clusters): In addition to compactness and separability, this metric calculates *cohesion* which is defined as the overall density of a cluster with respect to how much the density changes within that cluster [@cdbw]. Value range is $[0, \infty]$ and should be maximised.
+    
+    * It must be noted that the usage of connectivity, silhouette and Dunn index to evaluate density-based
+algorithm such as DBSCAN must be treated with caution. These three metrics have an underlying assumption where the generated clusters are globular in shape, whereas DBSCAN is capable of creating arbitrarily-shaped clusters [@dbcv], and none of these metrics are able to handle evaluating points assigned as noise. Only CDbw has been designed to handle density-based clusters, but nevertheless connectivity, silhouette and Dunn index has been included anyway due to the relative dearth of density-based validation metrics [@silhouette].
 
 # References
