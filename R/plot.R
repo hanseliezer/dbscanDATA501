@@ -9,7 +9,8 @@
 #' @param kind How clusters are displayed as the grouping of data points. Default is `colour` (i.e.
 #' displays the clusters with different colours); other options are `shape` and `both` (colour *and*
 #' shape).
-#' @param ... Graphical parameters to be passed to `plot.default()`, or arguments for other methods.
+#' @param ... Additional graphical parameters to be passed to `plot.default()`, or arguments for other
+#' methods.
 #' 
 #' @keywords clustering
 #' @examples
@@ -29,12 +30,24 @@ plot.dbscanDATA501 <- function(x, ax1=1, ax2=2, kind='colour', ...) {
   classes <- factor(classes)
   classes_legend <- levels(classes)
   
+  # clean varargs
+  varargs <- list(...)
+  # remove y, type, col and pch by setting them to NULL. this will still work even
+  # if they weren't actually given in ...
+  varargs$y <- varargs$type <- varargs$col <- varargs$pch <- NULL
+  # because plot.default will be called through do.call, we'll be passing the actual data points.
+  # if no axis labels are set at all, those data points will be used as the labels. so need to
+  # if it's not given, then set it as the column name/index
+  if (!("xlab" %in% names(varargs))) varargs$xlab <- ax1
+  if (!("ylab" %in% names(varargs))) varargs$ylab <- ax2
+  
   # xpd allows stuff to be displayed outside the initial plot
   par(mar=c(5.1, 4, 4, 5.25), xpd=TRUE)
   
   if (kind == 'colour') {
-    plot.default(x=x$dataset[, ax1], y=x$dataset[, ax2], type="p",
-                 col=classes, pch=1, ...)
+    fixargs <- list(x=x$dataset[, ax1], y=x$dataset[, ax2], type="p",
+                    col=classes, pch=1)
+    do.call(plot.default, c(fixargs, varargs))
     # legend location is top left, but inset shifts it 101% to the right so now it's
     # placed top right just outside the plot. this way we don't have to bother setting
     # exact coordinates which can be iffy when given data of different scales
@@ -42,14 +55,16 @@ plot.dbscanDATA501 <- function(x, ax1=1, ax2=2, kind='colour', ...) {
            col=factor(classes_legend), pch=1)
   }
   else if (kind == 'shape') {
-    plot.default(x=x$dataset[, ax1], y=x$dataset[, ax2], type="p",
-                 col="red", pch=as.numeric(classes), ...)
+    fixargs <- list(x=x$dataset[, ax1], y=x$dataset[, ax2], type="p",
+                    col="red", pch=as.numeric(classes))
+    do.call(plot.default, c(fixargs, varargs))
     legend("topleft", inset=c(1, 0), legend=classes_legend,
            col="red", pch=factor(classes_legend))
   }
   else if (kind == 'both') {
-    plot.default(x=x$dataset[, ax1], y=x$dataset[, ax2], type="p",
-                 col=classes, pch=as.numeric(classes), ...)
+    fixargs <- list(x=x$dataset[, ax1], y=x$dataset[, ax2], type="p",
+                    col=classes, pch=as.numeric(classes))
+    do.call(plot.default, c(fixargs, varargs))
     legend("topleft", inset=c(1, 0), legend=classes_legend,
            col=factor(classes_legend), pch=factor(classes_legend))
   }
@@ -60,6 +75,10 @@ plot.dbscanDATA501 <- function(x, ax1=1, ax2=2, kind='colour', ...) {
 # helper function
 # input validation
 scatter_input_checks <- function(x, ax1, ax2, kind, ...) {
+  
+  if (x$metric == "precomputed") {
+    stop("Used 'metric' is 'precomputed'; a distance matrix cannot be plotted.")
+  }
   
   # check ax1. if a number, must be a scalar; if a character, then it must be column name in the dataset
   if (length(ax1) > 1 | (!is.numeric(ax1) & !is.character(ax1))) {
@@ -102,8 +121,12 @@ scatter_input_checks <- function(x, ax1, ax2, kind, ...) {
   # colour of the others)
   if (kind %in% c("shape", "both")) {
     if (length(unique(x$cluster_labs)) > 21) {
-      stop("Too many classes; R has a maximum of 21 different point symbols for plotting.
-           Use 'kind=colour' instead.")
+      stop("Too many classes; R has a maximum of 21 different point symbols for plotting. Use 'kind=colour' instead.")
     }
+  }
+  
+  # check ...
+  if (any(names(list(...)) %in% c("y", "type", "col", "pch"))) {
+    warning("Supplied additional arguments contains one of 'y', 'type', 'col', and 'pch', which has been assigned. These will be ignored.")
   }
 }

@@ -16,7 +16,7 @@ IntegerVector create_init_clusters(NumericMatrix dist_mat,
                                    IntegerVector labs,
                                    int clust_num) {
   
-  // generate initial clusters, only consisting of core points (points that fulfill the requirement
+  // generate initial clusters, only consisting of core points (points that fulfil the requirement
   // of having min_pts points within eps radius)
   for (int n=0; n < neigh_pts.length(); n++) {
     int idx = neigh_pts[n] - 1;

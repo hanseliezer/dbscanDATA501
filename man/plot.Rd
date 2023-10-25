@@ -17,7 +17,8 @@
 displays the clusters with different colours); other options are \code{shape} and \code{both} (colour \emph{and}
 shape).}
 
-\item{...}{Graphical parameters to be passed to \code{plot.default()}, or arguments for other methods.}
+\item{...}{Additional graphical parameters to be passed to \code{plot.default()}, or arguments for other
+methods.}
 }
 \description{
 Displays dataset on a 2-D scatter plot with the DBSCAN-generated clusters as the grouping variable.

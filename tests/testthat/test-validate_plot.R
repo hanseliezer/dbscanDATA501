@@ -48,8 +48,14 @@ test_that("Verify arguments", {
   expect_error(plot(circles_dbscan, kind=circles),
                "Please select one of 'colour', 'shape', and 'both'.")
   
-  expect_silent(plot(circles_dbscan, ax1=2, ax2=1))
+  # supplying additional y/type/col/pch will be ignored
+  expect_warning(plot(circles_dbscan, type="l"),
+                 "Supplied additional arguments contains one of 'y', 'type', 'col', and 'pch', which has been assigned. These will be ignored.")
+  expect_warning(plot(circles_dbscan, kind="shape", col="gray", pch=13, main="Test plot"),
+                 "Supplied additional arguments contains one of 'y', 'type', 'col', and 'pch', which has been assigned. These will be ignored.")
   
+  expect_silent(plot(circles_dbscan, ax1=2, ax2=1))
   expect_silent(plot(circles_dbscan, ax1=1, ax2=2, kind="shape"))
+  expect_silent(plot(circles_dbscan, kind="both", main="Another test plot", xlab="Side 1", ylab="Side 2"))
   
 })

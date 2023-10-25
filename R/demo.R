@@ -107,8 +107,8 @@ demo <- function(data, eps_list, min_pts_list) {
   print(cluster_summary)
   
   par(mar=c(5.1, 4, 4, 5.25), xpd=TRUE)
-  # use plot.default rather than plot.dbscanDATA501 as to give it a different axes labels
-  # and title
+  # not keeping/being returned a dbscanDATA501 object, so can't use plot.dbscanDATA501
+  # just use plot.default
   plot.default(data$X, data$Y, col=cluster_1$plot_classes, pch=20,
                xlab="X", ylab="Y", main=param_names[1])
   legend("topleft", inset=c(1, 0), legend=cluster_1$plot_classes_legend,

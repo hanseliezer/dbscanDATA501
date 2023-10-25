@@ -65,10 +65,10 @@ If dataset is not yet normalised, it is highly recommended to set \code{normalis
 the data first separately. As a distance-based algorithm, DBSCAN is sensitive to features being on
 varying scales.
 
-\code{border_pts=TRUE} means border points - points that do not have sufficient number of neighbours by
+\code{border_pts = TRUE} means border points - points that do not have sufficient number of neighbours by
 itself but are neighbours of a core point - are included in a cluster, and is consistent to the
-original algorithm as described by Ester et al. (1996). While \code{FALSE} excludes border points, which
-is more consistent to the definition of a cluster having to always have a certain minimum density,
+original algorithm as originally described by Ester et al. (1996). While \code{FALSE} excludes border points,
+which is more consistent to the definition of a cluster having to always have a certain minimum density,
 and is equivalent to hierarchical DBSCAN described in Campello et al. (2013).
 }
 \examples{
@@ -78,17 +78,17 @@ dbscan(blobs, 5, 0.2)
 }
 }
 \references{
-Sander, J., Ester, M., Kriegel, HP. et al. 1998. "Density-Based Clustering in Spatial Databases: The
-Algorithm GDBSCAN and Its Applications." \emph{Data Mining and Knowledge Discovery} 2: 169–194.
-https://doi.org/10.1023/A:1009745219419
+Campello, Ricardo J. G. B., Davoud Moulavi and Jörg Sander. 2013. "Density-Based Clustering Based on
+Hierarchical Density Estimates." In \emph{PAKDD 2013: Proceedings of the 17th Pacific-Asia Conference on
+Knowledge Discovery in Databases}, pp. 160-172. Berlin, Germany: Springer.
 
 Ester, Martin, Hans-Peter Kriegel, Jörg Sander, and Xiaowei Xu. 1996. “A Density-Based Algorithm for
 Discovering Clusters in Large Spatial Databases with Noise.” In \emph{KDD ’96: Proceedings of the 2nd
 International Conference on Knowledge Discovery and Data Mining}, pp. 226–31. Palo Alto, CA, United
 States: AAAI Press.
 
-Campello, Ricardo J. G. B., Davoud Moulavi and Jörg Sander. 2013. "Density-Based Clustering Based on
-Hierarchical Density Estimates." In \emph{PAKDD 2013: Proceedings of the 17th Pacific-Asia Conference on
-Knowledge Discovery in Databases}, pp. 160-172. Berlin, Germany: Springer.
+Sander, J., Ester, M., Kriegel, HP. et al. 1998. "Density-Based Clustering in Spatial Databases: The
+Algorithm GDBSCAN and Its Applications." \emph{Data Mining and Knowledge Discovery} 2: 169–194.
+https://doi.org/10.1023/A:1009745219419
 }
 \keyword{clustering}
