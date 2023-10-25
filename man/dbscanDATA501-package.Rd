@@ -10,7 +10,7 @@
   \itemize{
     \item{The main DBSCAN algorithm can be applied using the \code{dbscan()} function.}
     \item{Summary statistics on the generated clusters can be calculated and displayed through \code{summary()}.}
-    \item{The clusters can be displayed on a 2-D scatter plot using \code{scatter()}.}
+    \item{The clusters can be displayed on the data using a 2-D scatter plot using \code{plot()}.}
   }
 }
 \author{
