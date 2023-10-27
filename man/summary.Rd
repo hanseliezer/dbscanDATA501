@@ -42,8 +42,8 @@ is \code{euclidean}.
 \examples{
 \dontrun{
 data(blobs)
-blobs_clust <- dbscan(blobs, 0.2, 5)
-summary(blobs_clust)
+dbs <- dbscan(blobs, eps=0.2, min_pts=5)
+summary(dbs)
 }
 }
 \references{

@@ -66,7 +66,7 @@
 #' @examples
 #' \dontrun{
 #' data(blobs)
-#' dbscan(blobs, 5, 0.2)
+#' dbscan(blobs, eps=0.2, min_pts=5)
 #' }
 #' @rdname dbscan
 #' @export

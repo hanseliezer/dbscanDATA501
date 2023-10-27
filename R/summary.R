@@ -38,8 +38,8 @@
 #' @examples
 #' \dontrun{
 #' data(blobs)
-#' blobs_clust <- dbscan(blobs, 0.2, 5)
-#' summary(blobs_clust)
+#' dbs <- dbscan(blobs, eps=0.2, min_pts=5)
+#' summary(dbs)
 #' }
 #' @rdname summary
 #' @export
@@ -88,7 +88,9 @@ print.summary.dbscanDATA501 <-function(object, ...) {
   cat("Mean silhouette width (nearer to 1 better):", round(object$score_silh, 5), "\n")
   cat("Dunn index (higher better):", round(object$score_dunn, 5), "\n")
   cat(paste0("CDbw (higher better): ", round(object$score_cdbw, 5), "\n\n"))
-  cat("NOTE: Caution must be taken when interpreting connectivity, mean silhouette width\nand Dunn index for non-globular clusters.")
+  cat("NOTE:\n")
+  cat("- Caution must be taken when interpreting connectivity, mean silhouette width and Dunn index for non-globular clusters.\n")
+  cat("- Due to the underlying function's limitation, CDbw is only defined when 'metric = euclidean'.")
 }
 
 ##############################################################################

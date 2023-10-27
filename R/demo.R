@@ -7,6 +7,22 @@
 #' each with different `min_pts` and `eps` parameters, clustering summaries printed, and scatter plots
 #' drawn to display the resulting clusters to demonstrate the impact of the different parameters.
 #' 
+#' The parameters trialled for `blobs` are:
+#' \itemize{
+#'  \item `eps = 0.01`, `min_pts = 2`
+#'  \item `eps = 0.25`, `min_pts = 5`
+#'  \item `eps = 1`, `min_pts = 10`
+#' }
+#' 
+#' The parameters trialled for `circles` are:
+#' \itemize{
+#'  \item `eps = 0.075`, `min_pts = 3`
+#'  \item `eps = 0.1`, `min_pts = 5`
+#'  \item `eps = 0.25`, `min_pts = 10`
+#' }
+#' 
+#' The other arguments are set as `metric = euclidean`, `normalise = TRUE`, and `border_pts = TRUE`.
+#' 
 #' @returns There are two parts:
 #' \itemize{
 #'  \item Printed summary table of clustering results: number of clusters generated (excluding noise),
@@ -49,10 +65,10 @@ demo_summary <- function(data, eps, min_pts) {
   n_clusters <- if (length(clust_nums) > 0) length(clust_nums) else 0
   
   # calculate validation metrics
-  score_conn <- connectivity_wrapper(obj$dataset, obj$cluster_labs)
-  score_silh <- silhouette_wrapper(obj$dataset, obj$cluster_labs)
-  score_dunn <- dunn_wrapper(obj$dataset, obj$cluster_labs)
-  score_cdbw <- cdbw_wrapper(obj$dataset, obj$cluster_labs)
+  score_conn <- connectivity_wrapper(obj$dataset, obj$cluster_labs, obj$metric)
+  score_silh <- silhouette_wrapper(obj$dataset, obj$cluster_labs, obj$metric)
+  score_dunn <- dunn_wrapper(obj$dataset, obj$cluster_labs, obj$metric)
+  score_cdbw <- cdbw_wrapper(obj$dataset, obj$cluster_labs, obj$metric)
   
   # create classes for plot and it's legend
   classes <- replace(obj$cluster_labs, obj$cluster_labs == 0, "Noise")
@@ -97,9 +113,9 @@ demo <- function(data, eps_list, min_pts_list) {
   names(cluster_summary) <- c("No. clusters (excl. noise)", "Connectivity", "Mean silhouette width",
                               "Dunn index", "CDbw")
   # parameter values as row names
-  param_names <- c(paste0("eps=", eps_list[1], ", min_pts=", min_pts_list[1]),
-                   paste0("eps=", eps_list[2], ", min_pts=", min_pts_list[2]),
-                   paste0("eps=", eps_list[3], ", min_pts=", min_pts_list[3]))
+  param_names <- c(paste0("eps = ", eps_list[1], ", min_pts = ", min_pts_list[1]),
+                   paste0("eps = ", eps_list[2], ", min_pts = ", min_pts_list[2]),
+                   paste0("eps = ", eps_list[3], ", min_pts = ", min_pts_list[3]))
   rownames(cluster_summary) <- param_names
   
   # print a clean table

@@ -21,6 +21,6 @@ Hans Eliezer: eliezehans@myvuw.ac.nz
 \examples{
 \dontrun{
 blobs <- read.csv('dat/blobs.csv')
-blobs_dbscan <- dbscan(blobs, 0.2, 5)
+blobs_dbscan <- dbscan(blobs, eps=0.2, min_pts=5)
 }
 }

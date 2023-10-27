@@ -24,6 +24,22 @@ two clearly-separated approximately-globular clusters, and \code{circles} repres
 two hollow  circles inside each other. Three different algorithms will be fitted into the dataset,
 each with different \code{min_pts} and \code{eps} parameters, clustering summaries printed, and scatter plots
 drawn to display the resulting clusters to demonstrate the impact of the different parameters.
+
+The parameters trialled for \code{blobs} are:
+\itemize{
+\item \code{eps = 0.01}, \code{min_pts = 2}
+\item \code{eps = 0.25}, \code{min_pts = 5}
+\item \code{eps = 1}, \code{min_pts = 10}
+}
+
+The parameters trialled for \code{circles} are:
+\itemize{
+\item \code{eps = 0.075}, \code{min_pts = 3}
+\item \code{eps = 0.1}, \code{min_pts = 5}
+\item \code{eps = 0.25}, \code{min_pts = 10}
+}
+
+The other arguments are set as \code{metric = euclidean}, \code{normalise = TRUE}, and \code{border_pts = TRUE}.
 }
 \examples{
 \dontrun{

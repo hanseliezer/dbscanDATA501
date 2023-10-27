@@ -74,7 +74,7 @@ and is equivalent to hierarchical DBSCAN described in Campello et al. (2013).
 \examples{
 \dontrun{
 data(blobs)
-dbscan(blobs, 5, 0.2)
+dbscan(blobs, eps=0.2, min_pts=5)
 }
 }
 \references{

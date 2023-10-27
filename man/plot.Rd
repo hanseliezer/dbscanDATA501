@@ -26,7 +26,7 @@ Displays dataset on a 2-D scatter plot with the DBSCAN-generated clusters as the
 \examples{
 \dontrun{
 data(blobs)
-dbs <- dbscan(blobs, 5, 0.2)
+dbs <- dbscan(blobs, eps=0.2, min_pts=5)
 plot(dbs)
 }
 }
